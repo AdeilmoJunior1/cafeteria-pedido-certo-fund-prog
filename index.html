@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cafeteria Pedido Certo</title>
+  <link rel="stylesheet" href="./styles.css">
+  <script src="./regras.js" defer></script>
+  <script src="./script.js" defer></script>
+</head>
+<body>
+  <header class="cabecalho">
+    <div class="container">
+      <h1>Cafeteria Pedido Certo</h1>
+      <p>Protótipo educacional v0.1 — preços fictícios.</p>
+    </div>
+  </header>
+  <main class="container">
+    <noscript><p class="mensagem">Ative o JavaScript para montar o pedido.</p></noscript>
+    <p class="aviso"><strong>10% de desconto em pedidos a partir de R$ 30,00</strong></p>
+    <div class="layout">
+      <section class="painel" aria-labelledby="titulo-cardapio">
+        <h2 id="titulo-cardapio">Cardápio</h2>
+        <ul id="cardapio" class="cardapio"></ul>
+        <h2 id="titulo-inclusao">Adicionar ao pedido</h2>
+        <form id="formulario" novalidate aria-labelledby="titulo-inclusao">
+          <fieldset id="campos-inclusao">
+            <legend class="sr-only">Produto e quantidade</legend>
+            <label for="produto">Produto</label>
+            <select id="produto" name="produto" required aria-describedby="mensagem">
+              <option value="">Selecione um produto</option>
+            </select>
+            <label for="quantidade">Quantidade</label>
+            <input id="quantidade" name="quantidade" type="text" inputmode="numeric" autocomplete="off" value="1" required aria-describedby="ajuda-quantidade mensagem">
+            <p id="ajuda-quantidade" class="ajuda">Informe um número inteiro maior que zero.</p>
+            <button type="submit">Adicionar</button>
+          </fieldset>
+        </form>
+        <p id="mensagem" class="mensagem" aria-live="polite" aria-atomic="true"></p>
+      </section>
+      <section class="painel" aria-labelledby="titulo-resumo">
+        <h2 id="titulo-resumo">Resumo do pedido</h2>
+        <p id="pedido-vazio">Nenhum item adicionado.</p>
+        <div class="tabela-container">
+          <table id="tabela-pedido" hidden>
+            <caption>Itens para conferência com o cliente</caption>
+            <thead><tr><th scope="col">Produto</th><th scope="col">Quantidade</th><th scope="col">Preço unitário</th><th scope="col">Valor do item</th></tr></thead>
+            <tbody id="itens-pedido"></tbody>
+          </table>
+        </div>
+        <dl class="valores">
+          <div><dt>Subtotal</dt><dd id="subtotal">R$ 0,00</dd></div>
+          <div><dt>Desconto</dt><dd id="desconto">R$ 0,00</dd></div>
+          <div class="total"><dt>Total</dt><dd id="total">R$ 0,00</dd></div>
+        </dl>
+        <p>Confira os itens e os valores com o cliente antes de finalizar.</p>
+        <button id="finalizar" type="button">Finalizar pedido</button>
+        <section id="confirmacao" class="confirmacao" tabindex="-1" aria-labelledby="titulo-confirmacao" hidden>
+          <h3 id="titulo-confirmacao">Pedido finalizado</h3>
+          <p id="valores-confirmados"></p>
+          <p>O resumo permanece disponível. Novas inclusões estão bloqueadas. Nenhum pagamento foi realizado.</p>
+        </section>
+      </section>
+    </div>
+    <p class="ajuda">O pedido fica apenas em memória. Recarregar a página apaga o pedido.</p>
+  </main>
+  <footer class="container rodape"><a href="./tests.html">Abrir testes das regras de negócio</a></footer>
+</body>
+</html>
