@@ -1,5 +1,7 @@
 # Cafeteria Pedido Certo — v0.1
 
+**Demonstração pública:** [abrir a Cafeteria Pedido Certo](https://adeilmojunior1.github.io/cafeteria-pedido-certo-fund-prog/) · [abrir testes](https://adeilmojunior1.github.io/cafeteria-pedido-certo-fund-prog/tests.html)
+
 ## Objetivo, usuário e escopo
 
 Protótipo educacional para o atendente do balcão de uma pequena cafeteria montar um pedido e conferir os valores com o cliente antes de finalizá-lo. Atende um pedido por vez, com quatro produtos fixos e uma regra de desconto.
@@ -107,11 +109,11 @@ As funções de negócio podem ser testadas sem DOM. `tests.js` usa exatamente `
 
 ## Situação dos testes
 
-Os testes automáticos e roteiros manuais foram preparados. Nesta revisão local, `tests.html` executou 25 testes: 25 aprovados e 0 reprovados. Também foram exercitados no navegador local os fluxos de interface CA01–CA08; os resultados observados e o escopo exato estão registrados em `TESTES.md`.
+O site público foi implantado pelo GitHub Pages a partir da branch `main`, pasta raiz. Nesta revisão, `index.html` e `tests.html` responderam com HTTP 200; a suíte publicada executou 25 testes: 25 aprovados e 0 reprovados. Também foi exercitado no site o fluxo CA03/CA08. Os resultados locais e publicados estão registrados em `TESTES.md`.
 
 Ao abrir `tests.html`, a página executa os testes e exibe aprovado/reprovado, esperado e observado para aquela execução. A equipe deve executar também os testes manuais e registrar navegador, data, responsável e resultados em `TESTES.md`. Uma aprovação dos testes de negócio não comprova, sozinha, o funcionamento da interface.
 
-Não foram verificados GitHub Pages, teclado, leitor de tela, responsividade ou outros navegadores. Não há comprovação de publicação nesta entrega.
+Não foram verificados teclado, leitor de tela, responsividade ou outros navegadores.
 
 ## Limitações
 

@@ -8,9 +8,11 @@ A equipe deve revisar o código, executar os testes, registrar evidências e des
 
 ## Execução observada nesta revisão
 
-Em 17/11/2026, a página `tests.html` foi aberta como arquivo local no navegador integrado e executou **25 testes aprovados e 0 reprovados**. Também foram exercitados os fluxos da interface no mesmo ambiente local: CA01–CA08 apresentaram os resultados esperados. Para CA06 na interface, foram testadas as entradas vazia, `0`, `-1`, `1.5` e `abc`; as outras entradas inválidas listadas abaixo foram cobertas pelos testes automáticos das regras. A confirmação de CA08 manteve o resumo e bloqueou os controles de inclusão e finalização.
+Em 17/11/2026, a página `tests.html` foi aberta como arquivo local no navegador integrado e executou **25 testes aprovados e 0 reprovados**. Também foram exercitados os fluxos da interface no mesmo ambiente local: CA01–CA08 apresentaram os resultados esperados. Para CA06 na interface, foram testadas as entradas vazia, `0`, `-1`, `1.5` e `abc`; as outras entradas inválidas listadas abaixo foram cobertas pelos testes automáticos das regras.
 
-Esta execução não verificou GitHub Pages, teclado, leitor de tela, responsividade ou outros navegadores. A versão do navegador integrado não foi exposta. Estes resultados não substituem a revisão e os registros próprios da equipe.
+O projeto foi publicado como repositório público [AdeilmoJunior1/cafeteria-pedido-certo-fund-prog](https://github.com/AdeilmoJunior1/cafeteria-pedido-certo-fund-prog). O GitHub Pages foi configurado pela branch `main`, pasta raiz. Em 17/11/2026, as páginas `index.html` e `tests.html` responderam com HTTP 200; a suíte automática no endereço publicado executou **25 testes aprovados e 0 reprovados**. No site publicado, CA03/CA08 foram exercitados e exibiram subtotal de R$ 30,00, desconto de R$ 3,00 e total de R$ 27,00; a confirmação manteve o resumo e bloqueou os controles de inclusão e finalização.
+
+Não foram verificados teclado, leitor de tela, responsividade ou outros navegadores. A versão do navegador integrado não foi exposta. Estes resultados não substituem a revisão e os registros próprios da equipe.
 
 ## Preparação
 
