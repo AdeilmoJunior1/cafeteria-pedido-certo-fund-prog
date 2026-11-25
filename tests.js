@@ -43,8 +43,8 @@
     return obterTotais(montarPedido([["cafe-espresso", 2], ["pao-de-queijo", 1]]));
   });
 
-  registrar("CA03 — limite inclusivo de R$ 30,00", {
-    subtotalCentavos: 3000, descontoCentavos: 300, totalCentavos: 2700
+  registrar("CA03 — limite antigo não concede desconto em R$ 30,00", {
+    subtotalCentavos: 3000, descontoCentavos: 0, totalCentavos: 3000
   }, function () {
     return obterTotais(montarPedido([["sanduiche", 1], ["cappuccino", 1], ["pao-de-queijo", 1]]));
   });
@@ -123,14 +123,12 @@
     };
   });
 
-  registrar("CA08 — finalizar e impedir inclusão na lógica", {
+  registrar("CA08 — 4 cappuccinos e finalizar bloqueando alterações", {
     ok: true, finalizado: true,
-    subtotalCentavos: 3000, descontoCentavos: 300, totalCentavos: 2700,
+    subtotalCentavos: 4000, descontoCentavos: 400, totalCentavos: 3600,
     inclusaoAceita: false, pedidoPreservado: true, segundaFinalizacaoAceita: false
   }, function () {
-    const resultado = regras.finalizarPedido(montarPedido([
-      ["sanduiche", 1], ["cappuccino", 1], ["pao-de-queijo", 1]
-    ]));
+    const resultado = regras.finalizarPedido(montarPedido([["cappuccino", 4]]));
     const antes = JSON.stringify(resultado.pedido);
     const inclusao = regras.adicionarItem(resultado.pedido, "cafe-espresso", 1);
     const segundaFinalizacao = regras.finalizarPedido(resultado.pedido);
@@ -146,10 +144,151 @@
     };
   });
 
+  registrar("CA09 — editar 3 sanduíches para 1", {
+    subtotalCentavos: 1500, descontoCentavos: 0, totalCentavos: 1500, quantidade: 1
+  }, function () {
+    let pedido = montarPedido([["sanduiche", 3]]);
+    pedido = regras.editarItem(pedido, "sanduiche", 1).pedido;
+    const resumo = regras.calcularPedido(pedido);
+    return {
+      subtotalCentavos: resumo.subtotalCentavos,
+      descontoCentavos: resumo.descontoCentavos,
+      totalCentavos: resumo.totalCentavos,
+      quantidade: resumo.itens[0].quantidade
+    };
+  });
+
+  registrar("CA10 — editar cruza o limite em sentido decrescente", {
+    subtotalAnterior: 5000, descontoAnterior: 500,
+    subtotalNovo: 3500, descontoNovo: 0, totalNovo: 3500
+  }, function () {
+    let pedido = montarPedido([["sanduiche", 3], ["pao-de-queijo", 1]]);
+    const anterior = regras.calcularPedido(pedido);
+    pedido = regras.editarItem(pedido, "sanduiche", 2).pedido;
+    const novo = regras.calcularPedido(pedido);
+    return {
+      subtotalAnterior: anterior.subtotalCentavos,
+      descontoAnterior: anterior.descontoCentavos,
+      subtotalNovo: novo.subtotalCentavos,
+      descontoNovo: novo.descontoCentavos,
+      totalNovo: novo.totalCentavos
+    };
+  });
+
+  ["", "   ", "0", "-1", "1.5", "1,5", "abc", Infinity].forEach(function (entrada) {
+    registrar("CA11 — edição inválida: " + String(entrada), {
+      ok: false, mesmaReferencia: true, pedidoPreservado: true
+    }, function () {
+      const pedido = montarPedido([["sanduiche", 3]]);
+      const antes = JSON.stringify(pedido);
+      const resultado = regras.editarItem(pedido, "sanduiche", entrada);
+      return {
+        ok: resultado.ok,
+        mesmaReferencia: resultado.pedido === pedido,
+        pedidoPreservado: JSON.stringify(pedido) === antes && JSON.stringify(resultado.pedido) === antes
+      };
+    });
+  });
+
+  registrar("CA12 — remover todos os itens", {
+    vazio: true, subtotalCentavos: 0, descontoCentavos: 0,
+    totalCentavos: 0, finalizacaoAceita: false
+  }, function () {
+    let pedido = montarPedido([["cafe-espresso", 1]]);
+    pedido = regras.removerItem(pedido, "cafe-espresso").pedido;
+    const resumo = regras.calcularPedido(pedido);
+    const finalizacao = regras.finalizarPedido(pedido);
+    return {
+      vazio: resumo.itens.length === 0,
+      subtotalCentavos: resumo.subtotalCentavos,
+      descontoCentavos: resumo.descontoCentavos,
+      totalCentavos: resumo.totalCentavos,
+      finalizacaoAceita: finalizacao.ok
+    };
+  });
+
+  registrar("CA13 — operações diretas bloqueadas após finalizar", {
+    inclusaoAceita: false, edicaoAceita: false, remocaoAceita: false, pedidoPreservado: true
+  }, function () {
+    const finalizado = regras.finalizarPedido(montarPedido([["cafe-espresso", 1]])).pedido;
+    const antes = JSON.stringify(finalizado);
+    const inclusao = regras.adicionarItem(finalizado, "cafe-espresso", 1);
+    const edicao = regras.editarItem(finalizado, "cafe-espresso", 2);
+    const remocao = regras.removerItem(finalizado, "cafe-espresso");
+    return {
+      inclusaoAceita: inclusao.ok,
+      edicaoAceita: edicao.ok,
+      remocaoAceita: remocao.ok,
+      pedidoPreservado: JSON.stringify(finalizado) === antes &&
+        inclusao.pedido === finalizado && edicao.pedido === finalizado && remocao.pedido === finalizado
+    };
+  });
+
+  registrar("CA14 — remover café mantém somente sanduíche", {
+    linhas: 1, produtoId: "sanduiche", subtotalCentavos: 1500,
+    descontoCentavos: 0, totalCentavos: 1500
+  }, function () {
+    let pedido = montarPedido([["sanduiche", 1], ["cafe-espresso", 1]]);
+    pedido = regras.removerItem(pedido, "cafe-espresso").pedido;
+    const resumo = regras.calcularPedido(pedido);
+    return {
+      linhas: resumo.itens.length,
+      produtoId: resumo.itens[0].produtoId,
+      subtotalCentavos: resumo.subtotalCentavos,
+      descontoCentavos: resumo.descontoCentavos,
+      totalCentavos: resumo.totalCentavos
+    };
+  });
+
+  registrar("Edição crescente cruza R$ 40,00", {
+    subtotalAnterior: 3000, descontoAnterior: 0,
+    subtotalNovo: 4500, descontoNovo: 450, totalNovo: 4050
+  }, function () {
+    let pedido = montarPedido([["sanduiche", 2]]);
+    const anterior = regras.calcularPedido(pedido);
+    pedido = regras.editarItem(pedido, "sanduiche", 3).pedido;
+    const novo = regras.calcularPedido(pedido);
+    return {
+      subtotalAnterior: anterior.subtotalCentavos,
+      descontoAnterior: anterior.descontoCentavos,
+      subtotalNovo: novo.subtotalCentavos,
+      descontoNovo: novo.descontoCentavos,
+      totalNovo: novo.totalCentavos
+    };
+  });
+
+  registrar("Remoção elimina desconto", {
+    subtotalNovo: 500, descontoNovo: 0, totalNovo: 500
+  }, function () {
+    let pedido = montarPedido([["sanduiche", 3], ["pao-de-queijo", 1]]);
+    pedido = regras.removerItem(pedido, "sanduiche").pedido;
+    const novo = regras.calcularPedido(pedido);
+    return {
+      subtotalNovo: novo.subtotalCentavos,
+      descontoNovo: novo.descontoCentavos,
+      totalNovo: novo.totalCentavos
+    };
+  });
+
+  registrar("Produto inválido e item inexistente não alteram pedido", {
+    editarAceita: false, removerAceita: false, pedidoPreservado: true
+  }, function () {
+    const pedido = montarPedido([["cafe-espresso", 1]]);
+    const antes = JSON.stringify(pedido);
+    const editar = regras.editarItem(pedido, "item-inexistente", 2);
+    const remover = regras.removerItem(pedido, "item-inexistente");
+    return {
+      editarAceita: editar.ok,
+      removerAceita: remover.ok,
+      pedidoPreservado: JSON.stringify(pedido) === antes &&
+        editar.pedido === pedido && remover.pedido === pedido
+    };
+  });
+
   [
-    { subtotalCentavos: 2999, descontoCentavos: 0, totalCentavos: 2999 },
-    { subtotalCentavos: 3000, descontoCentavos: 300, totalCentavos: 2700 },
-    { subtotalCentavos: 3001, descontoCentavos: 300, totalCentavos: 2701 }
+    { subtotalCentavos: 3999, descontoCentavos: 0, totalCentavos: 3999 },
+    { subtotalCentavos: 4000, descontoCentavos: 400, totalCentavos: 3600 },
+    { subtotalCentavos: 4001, descontoCentavos: 400, totalCentavos: 3601 }
   ].forEach(function (esperado) {
     registrar("Limite direto — " + esperado.subtotalCentavos + " centavos", esperado, function () {
       return regras.calcularTotaisDoSubtotal(esperado.subtotalCentavos);
@@ -157,9 +296,9 @@
   });
 
   registrar("Arredondamento único — meio centavo", {
-    subtotalCentavos: 3005, descontoCentavos: 301, totalCentavos: 2704
+    subtotalCentavos: 4005, descontoCentavos: 401, totalCentavos: 3604
   }, function () {
-    return regras.calcularTotaisDoSubtotal(3005);
+    return regras.calcularTotaisDoSubtotal(4005);
   });
 
   registrar("RN06 — formato brasileiro com duas casas", [
