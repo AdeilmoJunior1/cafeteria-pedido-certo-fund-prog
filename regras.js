@@ -9,6 +9,9 @@
     Object.freeze({ id: "sanduiche", nome: "Sanduíche", precoCentavos: 1500 })
   ]);
 
+  const PERCENTUAL_DESCONTO = 10;
+  const LIMITE_DESCONTO_CENTAVOS = 4000;
+
   const formatador = new Intl.NumberFormat("pt-BR", {
     style: "currency",
     currency: "BRL",
@@ -68,10 +71,10 @@
     validarCentavos(subtotalCentavos);
     let descontoCentavos = 0;
 
-    // RN05: o limite de 3.000 centavos é inclusivo.
+    // RN05: o limite de 4.000 centavos é inclusivo.
     // Dividir por 10 calcula 10%; arredondamos uma única vez.
-    if (subtotalCentavos >= 3000) {
-      descontoCentavos = Math.round(subtotalCentavos / 10);
+    if (subtotalCentavos >= LIMITE_DESCONTO_CENTAVOS) {
+      descontoCentavos = Math.round(subtotalCentavos * PERCENTUAL_DESCONTO / 100);
     }
     return {
       subtotalCentavos: subtotalCentavos,
@@ -120,6 +123,7 @@
         pedido: pedido
       };
     }
+
     const validacao = validarProdutoEQuantidade(produtoId, entradaQuantidade);
     if (!validacao.ok) {
       return {
@@ -158,6 +162,94 @@
       ok: true,
       mensagem: "Item adicionado. Confira o resumo do pedido.",
       pedido: novoPedido
+    };
+  }
+
+  function editarItem(pedido, produtoId, entradaQuantidade) {
+    if (pedido.finalizado) {
+      return {
+        ok: false,
+        mensagem: "Este pedido já foi finalizado. A edição está bloqueada.",
+        pedido: pedido
+      };
+    }
+
+    const validacao = validarProdutoEQuantidade(produtoId, entradaQuantidade);
+    if (!validacao.ok) {
+      return {
+        ok: false,
+        campo: validacao.campo,
+        mensagem: validacao.mensagem,
+        pedido: pedido
+      };
+    }
+
+    const existente = pedido.itens.find(function (item) {
+      return item.produtoId === produtoId;
+    });
+    if (!existente) {
+      return {
+        ok: false,
+        campo: "produto",
+        mensagem: "Não foi possível editar: o item não existe no pedido.",
+        pedido: pedido
+      };
+    }
+
+    const itens = pedido.itens.map(function (item) {
+      return {
+        produtoId: item.produtoId,
+        quantidade: item.produtoId === produtoId ? validacao.quantidade : item.quantidade
+      };
+    });
+    const novoPedido = { itens: itens, finalizado: false };
+    try {
+      calcularPedido(novoPedido);
+    } catch (erro) {
+      return {
+        ok: false,
+        campo: "quantidade",
+        mensagem: "Não foi possível editar: a quantidade ou o valor excede o limite numérico seguro.",
+        pedido: pedido
+      };
+    }
+    return {
+      ok: true,
+      mensagem: "Quantidade alterada. Confira o resumo atualizado.",
+      pedido: novoPedido
+    };
+  }
+
+  function removerItem(pedido, produtoId) {
+    if (pedido.finalizado) {
+      return {
+        ok: false,
+        mensagem: "Este pedido já foi finalizado. A remoção está bloqueada.",
+        pedido: pedido
+      };
+    }
+
+    const existente = pedido.itens.find(function (item) {
+      return item.produtoId === produtoId;
+    });
+    if (!existente) {
+      return {
+        ok: false,
+        campo: "produto",
+        mensagem: "Não foi possível remover: o item não existe no pedido.",
+        pedido: pedido
+      };
+    }
+
+    const itens = pedido.itens.filter(function (item) {
+      return item.produtoId !== produtoId;
+    }).map(function (item) {
+      return { produtoId: item.produtoId, quantidade: item.quantidade };
+    });
+    return {
+      ok: true,
+      mensagem: "Item removido. Confira o resumo atualizado.",
+      pedido: { itens: itens, finalizado: false }
     };
   }
 
@@ -203,9 +295,13 @@
 
   window.CafeteriaRegras = Object.freeze({
     cardapio: cardapio,
+    PERCENTUAL_DESCONTO: PERCENTUAL_DESCONTO,
+    LIMITE_DESCONTO_CENTAVOS: LIMITE_DESCONTO_CENTAVOS,
     criarPedido: criarPedido,
     validarProdutoEQuantidade: validarProdutoEQuantidade,
     adicionarItem: adicionarItem,
+    editarItem: editarItem,
+    removerItem: removerItem,
     calcularTotaisDoSubtotal: calcularTotaisDoSubtotal,
     calcularPedido: calcularPedido,
     finalizarPedido: finalizarPedido,

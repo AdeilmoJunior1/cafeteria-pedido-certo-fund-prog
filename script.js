@@ -59,6 +59,43 @@
       acrescentarCelula(linha, String(item.quantidade), false);
       acrescentarCelula(linha, regras.formatarMoeda(item.precoUnitarioCentavos), false);
       acrescentarCelula(linha, regras.formatarMoeda(item.valorCentavos), false);
+      const celulaAcoes = document.createElement("td");
+      const acoes = document.createElement("div");
+      acoes.className = "acoes-item";
+
+      const rotuloEdicao = document.createElement("label");
+      rotuloEdicao.htmlFor = "editar-" + item.produtoId;
+      rotuloEdicao.className = "sr-only";
+      rotuloEdicao.textContent = "Nova quantidade de " + item.nome;
+
+      const campoEdicao = document.createElement("input");
+      campoEdicao.id = "editar-" + item.produtoId;
+      campoEdicao.className = "campo-edicao";
+      campoEdicao.type = "text";
+      campoEdicao.inputMode = "numeric";
+      campoEdicao.value = String(item.quantidade);
+      campoEdicao.disabled = pedido.finalizado;
+      campoEdicao.setAttribute("aria-label", "Nova quantidade de " + item.nome);
+
+      const botaoEditar = document.createElement("button");
+      botaoEditar.type = "button";
+      botaoEditar.className = "botao-editar";
+      botaoEditar.textContent = "Alterar";
+      botaoEditar.dataset.acao = "editar";
+      botaoEditar.dataset.produto = item.produtoId;
+      botaoEditar.disabled = pedido.finalizado;
+
+      const botaoRemover = document.createElement("button");
+      botaoRemover.type = "button";
+      botaoRemover.className = "botao-remover";
+      botaoRemover.textContent = "Remover";
+      botaoRemover.dataset.acao = "remover";
+      botaoRemover.dataset.produto = item.produtoId;
+      botaoRemover.disabled = pedido.finalizado;
+
+      acoes.append(rotuloEdicao, campoEdicao, botaoEditar, botaoRemover);
+      celulaAcoes.appendChild(acoes);
+      linha.appendChild(celulaAcoes);
       elementos.itens.appendChild(linha);
     });
     const temItens = resumo.itens.length > 0;
@@ -91,6 +128,38 @@
         elementos[resultado.campo].setAttribute("aria-invalid", "true");
         elementos[resultado.campo].focus();
       }
+      return;
+    }
+    pedido = resultado.pedido;
+    apresentarResumo();
+    mostrarMensagem(resultado.mensagem, "sucesso");
+  });
+
+  elementos.itens.addEventListener("click", function (evento) {
+    const botao = evento.target.closest("button[data-acao]");
+    if (!botao || pedido.finalizado) {
+      return;
+    }
+    const produtoId = botao.dataset.produto;
+    if (botao.dataset.acao === "remover") {
+      const resultado = regras.removerItem(pedido, produtoId);
+      if (!resultado.ok) {
+        mostrarMensagem(resultado.mensagem, "erro");
+        return;
+      }
+      pedido = resultado.pedido;
+      apresentarResumo();
+      mostrarMensagem(resultado.mensagem, "sucesso");
+      return;
+    }
+
+    const campo = document.getElementById("editar-" + produtoId);
+    campo.removeAttribute("aria-invalid");
+    const resultado = regras.editarItem(pedido, produtoId, campo.value);
+    if (!resultado.ok) {
+      mostrarMensagem(resultado.mensagem, "erro");
+      campo.setAttribute("aria-invalid", "true");
+      campo.focus();
       return;
     }
     pedido = resultado.pedido;

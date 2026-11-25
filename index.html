@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Cafeteria Pedido Certo</title>
+  <title>Cafeteria Pedido Certo — v0.2</title>
   <link rel="stylesheet" href="./styles.css">
   <script src="./regras.js" defer></script>
   <script src="./script.js" defer></script>
@@ -12,12 +12,12 @@
   <header class="cabecalho">
     <div class="container">
       <h1>Cafeteria Pedido Certo</h1>
-      <p>Protótipo educacional v0.1 — preços fictícios.</p>
+      <p>Protótipo educacional v0.2 — preços fictícios.</p>
     </div>
   </header>
   <main class="container">
     <noscript><p class="mensagem">Ative o JavaScript para montar o pedido.</p></noscript>
-    <p class="aviso"><strong>10% de desconto em pedidos a partir de R$ 30,00</strong></p>
+    <p class="aviso"><strong>10% de desconto em pedidos a partir de R$ 40,00</strong></p>
     <div class="layout">
       <section class="painel" aria-labelledby="titulo-cardapio">
         <h2 id="titulo-cardapio">Cardápio</h2>
@@ -44,7 +44,7 @@
         <div class="tabela-container">
           <table id="tabela-pedido" hidden>
             <caption>Itens para conferência com o cliente</caption>
-            <thead><tr><th scope="col">Produto</th><th scope="col">Quantidade</th><th scope="col">Preço unitário</th><th scope="col">Valor do item</th></tr></thead>
+            <thead><tr><th scope="col">Produto</th><th scope="col">Quantidade</th><th scope="col">Preço unitário</th><th scope="col">Valor do item</th><th scope="col">Ações</th></tr></thead>
             <tbody id="itens-pedido"></tbody>
           </table>
         </div>

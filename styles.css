@@ -50,6 +50,11 @@ th { background: #f0e9e0; }
 .resultado-aprovado { color: #245d32; font-weight: 700; }
 .resultado-reprovado { color: #9a2020; font-weight: 700; }
 td pre { margin: 0; white-space: pre-wrap; overflow-wrap: anywhere; font-size: 0.9rem; }
+.acoes-item { display: flex; align-items: end; gap: 0.45rem; flex-wrap: wrap; }
+.campo-edicao { width: 5.5rem; min-height: 44px; }
+.botao-editar { min-height: 44px; }
+.botao-remover { min-height: 44px; background: #fff; color: #7a2323; border-color: #7a2323; }
+.botao-remover:hover:not(:disabled) { background: #f8eded; }
 @media (max-width: 760px) {
   .layout { grid-template-columns: 1fr; }
   .painel { padding: 1rem; }
